@@ -140,6 +140,7 @@ def do_train(cfg, model, resume=False):
     data_loader = build_detection_train_loader(cfg)
     logger.info("Starting training from iteration {}".format(start_iter))
     with EventStorage(start_iter) as storage:
+        loss_to_plot=[]
         for data, iteration in zip(data_loader, range(start_iter, max_iter)):
             storage.iter = iteration
 
@@ -149,6 +150,7 @@ def do_train(cfg, model, resume=False):
 
             loss_dict_reduced = {k: v.item() for k, v in comm.reduce_dict(loss_dict).items()}
             losses_reduced = sum(loss for loss in loss_dict_reduced.values())
+            loss_to_plot.append(losses_reduced)
             if comm.is_main_process():
                 storage.put_scalars(total_loss=losses_reduced, **loss_dict_reduced)
 
@@ -173,6 +175,11 @@ def do_train(cfg, model, resume=False):
                 for writer in writers:
                     writer.write()
             periodic_checkpointer.step(iteration)
+        plt.plot(loss_to_plot, '-b', label='loss')
+        plt.xlabel("n iteration")
+        plt.title("Training loss")
+        plt.savefig(title + ".png")
+        plt.show()
 
 
 def setup(args):
