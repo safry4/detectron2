@@ -4,7 +4,7 @@
 
 2. Plots representing training loss with and without Feature-Noise is added.
 
-# Instructions:
+## Instructions:
 
 1. Download Coco dataset and transform it according instructions here (https://github.com/facebookresearch/detectron2/blob/main/datasets/README.md)
 The data format should be in .json format: train_2017.json under coco/annotations folder.
